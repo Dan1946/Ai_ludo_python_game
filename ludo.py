@@ -182,7 +182,6 @@ class Seed:
     def draw(self, win):
         pygame.draw.circle(win, GREY, (self.x, self.y), self.radius + self.OUTLINE)
         pygame.draw.circle(win, self.color, (self.x, self.y), self.radius - self.PADDING)
-        # pygame.draw.circle(win, self.house_pos_color, (self.x, self.y), self.radius, 7)
     
     def set_seed_position(self, x, y):
         self.x = x
@@ -399,11 +398,11 @@ class Board:
             # Weight values for different factors
             weight_home_tokens = 2 #2
             weight_tokens_in_safety = 1 #1
-            weight_opponent_tokens_in_safety = -4 #-1
+            weight_opponent_tokens_in_safety = -50 #-1
             weight_tokens_on_board = 5.5 #0.5
-            weight_tokens_to_safety = 1  #1 New weight for prioritizing safety
+            weight_tokens_to_safety = 2 #1 New weight for prioritizing safety
             weight_tokens_to_leave_board = 2 #2 New weight for leaving the board
-            weight_seed_captures = 40  #5 New weight for seed captures
+            weight_seed_captures = 70  #5 New weight for seed captures
 
             current_player_color = list(self.current_player.seeds.keys())
 
@@ -552,8 +551,7 @@ def handle_enemy_capture(seed_groups, seed_placement, move, current_seed, curren
 
                 break
 
-    if capture:
-        if current_seed in seed_groups[current_seed.color]:
+    if capture and current_seed in seed_groups[current_seed.color]:
             seed_groups[current_seed.color].remove(current_seed)  
             current_player.num_of_active_seeds -= 1
             current_player.num_of_seeds -= 1
@@ -561,7 +559,6 @@ def handle_enemy_capture(seed_groups, seed_placement, move, current_seed, curren
     
     elif box_grid[a][b] == 7 and current_seed in seed_groups[current_seed.color]:
         seed_groups[current_seed.color].remove(current_seed)
-        current_player.num_of_active_seeds -= 1
         current_player.num_of_seeds -= 1
         current_player.score += 1
         unused_move.clear()
@@ -695,22 +692,7 @@ def handle_player_turn(players, current_player_idx, lucky):
     if not lucky:
         current_player_idx = (current_player_idx + 1) % len(players)
 
-    return current_player_idx
-
-
-def regulate_current_player_and_opponent(self, change_player, players, current_player_idx, lucky, lucky_roll, num_movement):
-    if change_player:
-            current_player_idx = handle_player_turn(players, current_player_idx, lucky)
-            lucky = False 
-            
-            current_player = players[current_player_idx]
-            self.current_player = current_player
-
-            if num_movement == lucky_roll:
-                lucky = True
-
-            self.opponets = [player for player in players if player != current_player]
-    
+    return current_player_idx  
 
 
 class SimulateGame:
@@ -738,14 +720,14 @@ class SimulateGame:
         moved = False
         seed_moved = None
         seed_outside = [0 for seeds in current_player.seeds.values() for seed in seeds if seed.out]
-        print(seed_outside)
+        # print(seed_outside)
         num_seeds_out = len(seed_outside)
 
         for idx, move in enumerate(seeds_to_move[seed][1]):
                 i, j = move
                 tile = self.box_positions[move]
                 value = self.box_grid[i][j]
-                print(tile.safe)
+                # print(tile.safe)
 
                 if move == best_move:
                 
@@ -825,11 +807,9 @@ class SimulateGame:
                 if len(possible_moves) and len(valid_moves):
                     seeds_moves[seed] = possible_moves, valid_moves
         
-        #  print(seeds_moves)
 
          return seeds_moves
 
-    
     def simulate_dice_roll(self):
         dice_roll_possiblites = []
         for i in range(1, 7):
@@ -944,7 +924,6 @@ class LudoGame:
         square_size = 50
         seeds_to_move = {}
         winner = None 
-        human_played = True
         s = None
         unused_empty = False
 

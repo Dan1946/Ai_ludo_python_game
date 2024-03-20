@@ -140,9 +140,10 @@ def simulate_move(possible_moves, seed, move, box_grid, unused_move, board):
     if len(unused_move):
         if not isinstance(value, int):
             if str(value.player) != str(seed.player) and not(board.box_pos[move].safe):
-                board.capture[seed.color] = board.capture.get(seed.color, 0) + 1
+                board.capture[seed.color] = board.capture.get(seed.color, 0)
                 print(board.capture)
                 box_grid[i][j] = -1
+                pygame.time.delay(1000)
             
             else:
                 print("false")
@@ -162,10 +163,9 @@ def simulate_move(possible_moves, seed, move, box_grid, unused_move, board):
         if not seed.out and 6 in unused_move:
             print(unused_move)
             unused_move.remove(6)
-            if len(unused_move):
-                if unused_move[0] == idx:
+            if len(unused_move) and unused_move[0] == idx:
                     unused_move.clear()
-
+ 
             seed.out = True
            
         seed.current_pos = move
